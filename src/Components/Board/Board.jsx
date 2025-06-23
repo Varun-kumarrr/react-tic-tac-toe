@@ -122,23 +122,38 @@ function Board() {
           const empty = newBoard.map((v, i) => (v === "" ? i : null)).filter(v => v !== null);
           move = empty[Math.floor(Math.random() * empty.length)];
         } else if (difficulty === "Medium") {
-          move = newBoard.findIndex((_, i) => {
-            const test = [...newBoard];
-            test[i] = "O";
-            return getWinner(test) === "O";
-          });
-          if (move === -1) {
-            move = newBoard.findIndex((_, i) => {
+          // Try to win
+          for (let i = 0; i < 9; i++) {
+            if (newBoard[i] === "") {
               const test = [...newBoard];
-              test[i] = "X";
-              return getWinner(test) === "X";
-            });
+              test[i] = "O";
+              if (getWinner(test) === "O") {
+                move = i;
+                break;
+              }
+            }
           }
-          if (move === -1) {
+
+          // Try to block player
+          if (move === undefined) {
+            for (let i = 0; i < 9; i++) {
+              if (newBoard[i] === "") {
+                const test = [...newBoard];
+                test[i] = "X";
+                if (getWinner(test) === "X") {
+                  move = i;
+                  break;
+                }
+              }
+            }
+          }
+
+          // Random move
+          if (move === undefined) {
             const empty = newBoard.map((v, i) => (v === "" ? i : null)).filter(v => v !== null);
             move = empty[Math.floor(Math.random() * empty.length)];
           }
-        } else {
+        } else if (difficulty === "Hard") {
           move = minimax(newBoard, true).move;
         }
 
